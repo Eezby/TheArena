@@ -1,5 +1,7 @@
 {
   "name": "project",
+  "servePort": 1,
+  "servePlaceIds": [8144085164],
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
