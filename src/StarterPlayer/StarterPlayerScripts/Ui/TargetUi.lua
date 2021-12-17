@@ -22,15 +22,18 @@ local PlayerScripts = LocalPlayer:WaitForChild("PlayerScripts")
 local PlayerUiModules = PlayerScripts:WaitForChild("Ui")
 local CastbarUi = require(PlayerUiModules:WaitForChild("CastbarUi"))
 
+local PlayerServices = PlayerScripts:WaitForChild("Services")
+local EntityHandler = require(PlayerServices:WaitForChild("EntityHandler"))
+
 local function getTargetInfo(target)
 	local info = {}
-	info.model = target.model
 	info.targetType = target.targetType
-	info.name = info.model.Name
 	
 	if target.targetType == "Player" then
-		info.player = Players:GetPlayerFromCharacter(info.model)
+		info.player = target.object
 		
+		info.name = info.player.Name
+		info.model = info.player.Character
 		info.health = PlayerValues:GetValue(info.player, "Health") or 1
 		info.maxHealth = PlayerValues:GetValue(info.player, "MaxHealth") or 1
 		info.power = PlayerValues:GetValue(info.player, "Power") or 1
@@ -39,8 +42,12 @@ local function getTargetInfo(target)
 		info.target = PlayerValues:GetValue(info.player, "Target")
 		info.class = PlayerValues:GetValue(info.player, "Class") or "???"
 	elseif target.targetType == "NPC" then
-		info.health = 25
-		info.maxHealth = 25
+		info.entity = EntityHandler.GetEntityFromId(target.object.id)
+
+		info.name = info.entity.name
+		info.model = info.entity.visual
+		info.health = info.entity.health
+		info.maxHealth = info.entity.maxHealth
 		info.power = 25
 		info.maxPower = 25
 		info.castInfo = nil

@@ -47,7 +47,7 @@ end
 function Ability:ServerAbility(player, castIdentifier, args, startTime)
 	AbInject.PlayerRemoteService:FireAllClientsExclude(Signal, player, "ability", player, castIdentifier, args, startTime)
 	
-	AbInject.DamageService:DoDamage(args.target.model, {
+	AbInject.DamageService:DoDamage(args.target.object, {
 		ability = SelfAbilityData.name,
 		damageType = "direct",
 		fromPlayer = player

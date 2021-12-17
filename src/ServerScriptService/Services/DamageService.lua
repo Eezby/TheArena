@@ -9,6 +9,9 @@ local Players = game:GetService("Players")
 local RepData = ReplicatedStorage.Data
 local AbilityData = require(RepData.AbilityData)
 
+local Helpers = ReplicatedStorage.Helpers
+local TargetHelper = require(Helpers.TargetHelper)
+
 local SerServices = ServerScriptService.Services
 local EffectService = require(SerServices.EffectService)
 local ShieldService = require(SerServices.ShieldService)
@@ -56,6 +59,7 @@ local DamageService = {}
 function DamageService:DoDamage(targets, args)
 	if not args then args = {} end
 	if typeof(targets) ~= "table" then targets = {targets} end
+	if #targets == 0 then targets = {targets} end
 
 	if not targets[1] then targets = convertDictionaryToTable(targets) end
 	
@@ -67,7 +71,7 @@ function DamageService:DoDamage(targets, args)
 	end
 
 	for _,target in pairs(targets) do
-		local player = Players:GetPlayerFromCharacter(target)
+		local player = target
 		if not player then
 			if target:IsDescendantOf(Players) then
 				player = target
@@ -107,7 +111,7 @@ function DamageService:DoDamage(targets, args)
 			EffectService:TookDamage(target, args.damageType, args.fromPlayer)
 			
 			if args.fromPlayer then
-				OverheadRemote:FireAllClients("damage", args.fromPlayer, target, adjustedDamage, {
+				OverheadRemote:FireAllClients("damage", args.fromPlayer, TargetHelper:GetTargetPosition(target), adjustedDamage, {
 					isCrit = isCriticalHit
 				})
 			end

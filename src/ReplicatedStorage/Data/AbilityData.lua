@@ -28,6 +28,9 @@ local AbilityData = {
 		projectileSpeed = 50,
 
 		targetType = "enemy",
+		effects = {
+			["Burn"] = {duration = 8, damagePercentage = 0.15}
+		},
 
 		image = "30276856",
 		animations = {

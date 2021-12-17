@@ -43,6 +43,8 @@ local AbilityService = {}
 
 function AbilityService:NormalAbility(castIdentifier, ability, args)
 	local abilityData = AbilityData[ability]
+
+	args.target = TargetHelper:ConvertTargetForServer(args.target)
 	
 	local abilityIsAvailable, errorMessage = TargetHelper:CanUseAbility(LocalPlayer, abilityData, args.target)
 	if abilityIsAvailable then
@@ -61,6 +63,8 @@ function AbilityService:NormalAbility(castIdentifier, ability, args)
 				task.spawn(cancelOnMove, ability, abilityData.castTime, castIdentifier)
 			end
 		end
+	else
+		warn(errorMessage)
 	end
 end
 

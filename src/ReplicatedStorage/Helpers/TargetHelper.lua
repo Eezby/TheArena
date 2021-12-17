@@ -12,18 +12,22 @@ local PlayerCooldowns = require(RepServices:WaitForChild("PlayerCooldowns"))
 local Utility = ReplicatedStorage:WaitForChild("Utility")
 local CollectionSelect = require(Utility:WaitForChild("CollectionSelect"))
 
-
 local EffectService
 local EffectReplicator
+
+local EntityService
+local EntityHandler
 
 if not IsServer then
 	local LocalPlayer = Players.LocalPlayer
 	local PlayerScripts = LocalPlayer:WaitForChild("PlayerScripts")
 	local PlayerServices = PlayerScripts:WaitForChild("Services")
 	EffectReplicator = require(PlayerServices:WaitForChild("EffectReplicator"))
+	EntityHandler = require(PlayerServices:WaitForChild("EntityHandler"))
 else
 	local SerServices = ServerScriptService.Services
 	EffectService = require(SerServices.EffectService)
+	EntityService = require(SerServices.EntityService)
 end
 
 local TargetHelper = {}
@@ -65,11 +69,11 @@ function TargetHelper:CanUseAbility(player, abilityData, target)
 		return false, "No ability data"
 	end
 
-	if not TargetHelper:IsViableTarget(player.Character, (target or {model = nil}).model, abilityData.targetType) then
+	if not TargetHelper:IsViableTarget(player, self:GetObjectFromTarget(target), abilityData.targetType) then
 		return false, "Invalid target"
 	end
 
-	if target ~= nil and not TargetHelper:IsTargetInRange(player.Character:GetPivot().Position, target.model, abilityData.range) then
+	if target ~= nil and not TargetHelper:IsTargetInRange(player.Character:GetPivot().Position, self:GetObjectFromTarget(target), abilityData.range) then
 		return false, "Target out of range"
 	end
 
@@ -101,7 +105,57 @@ function TargetHelper:IsViableTarget(sender, target, targetType)
 end
 
 function TargetHelper:IsTargetInRange(position, target, range)
-	return not target or range == nil or (position - target:GetPivot().Position).Magnitude <= range
+	local targetPosition
+
+	if target.Character then
+		targetPosition = target.Character:GetPivot().Position
+	else
+		targetPosition = target.cframe.Position
+	end
+
+	return not target or range == nil or (position - targetPosition).Magnitude <= range
+end
+
+function TargetHelper:GetObjectFromTarget(target)
+	if not target then return nil end
+
+	if target.targetType == "Player" then
+		return target.object
+	elseif target.targetType == "NPC" then
+		if IsServer then
+			return EntityService.GetEntityFromId(target.object.id)
+		else
+			return EntityHandler.GetEntityFromId(target.object.id)
+		end
+	end
+end
+
+function TargetHelper:ConvertTargetForServer(target)
+	if not target then return nil end
+	
+	local convertedTarget = {
+		targetType = target.targetType
+	}
+
+	if target.targetType == "Player" then
+		convertedTarget.object = target.object
+	elseif target.targetType == "NPC" then
+		convertedTarget.object = {id = target.object.id}
+	end
+
+	return convertedTarget
+end
+
+function TargetHelper:GetTargetPosition(target)
+	if typeof(target) == "Instance" then
+		if target.Parent == Players then
+			return target.Character:GetPivot().Position
+		end
+
+		return target:GetPivot().Position
+	elseif typeof(target) == "table" then
+		return target.cframe.Position
+	end
 end
 
 -- args: 

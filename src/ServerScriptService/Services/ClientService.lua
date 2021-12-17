@@ -67,6 +67,8 @@ end
 function ClientService:UseAbility(player, ability, identifier, args, startTime)
 	local timeDifference = math.abs(SharedFunctions:GetTime() - startTime)
 	
+	args.target.object = TargetHelper:GetObjectFromTarget(args.target)
+	
 	local abilityData = AbilityData[ability]
 	local abilityIsAvailable, errorMessage = TargetHelper:CanUseAbility(player, abilityData, args.target)
 	
@@ -93,6 +95,7 @@ ClientInputRemote.OnServerEvent:Connect(function(client, action, startTime, args
 end)
 
 TargetRemote.OnServerEvent:Connect(function(client, target)
+	target.object = TargetHelper:GetObjectFromTarget(target)
 	PlayerValues:SetValue(client, "Target", target, true)
 end)
 

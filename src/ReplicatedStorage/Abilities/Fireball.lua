@@ -91,7 +91,7 @@ function Ability:Fire(player, castIdentifier, currentTarget)
 		local fireballProjectile = SelfAssets.Fireball:Clone()
 		fireballProjectile.Parent = workspace.Dynamic
 		
-		local projectileValues = AbInject.ProjectileService:FireAtTarget(currentTarget.model, {
+		local projectileValues = AbInject.ProjectileService:FireAtTarget(currentTarget.object, {
 			startCFrame = character:GetPivot() + character:GetPivot().LookVector * 2,
 			projectile = fireballProjectile,
 			projectileSpeed = SelfAbilityData.projectileSpeed
@@ -129,7 +129,7 @@ function Ability:ServerAbility(player, castIdentifier, args, startTime)
 	
 	local playerCastInfo = AbInject.PlayerValues:GetValue(player, "CastInfo")
 	if playerCastInfo and playerCastInfo.castIdentifier == castIdentifier then
-		local projectileValues = AbInject.ProjectileService:FireAtTarget(args.target.model, {
+		local projectileValues = AbInject.ProjectileService:FireAtTarget(args.target.object, {
 			startCFrame = character:GetPivot() + character:GetPivot().LookVector * 2,
 			projectile = debugProjectile,
 			projectileSpeed = SelfAbilityData.projectileSpeed
@@ -138,7 +138,7 @@ function Ability:ServerAbility(player, castIdentifier, args, startTime)
 		projectileValues.Finished.Event:Wait()
 		
 		debugProjectile:Destroy()
-		AbInject.DamageService:DoDamage(args.target.model, {
+		AbInject.DamageService:DoDamage(args.target.object, {
 			ability = SelfAbilityData.name,
 			damageType = "direct",
 			fromPlayer = player

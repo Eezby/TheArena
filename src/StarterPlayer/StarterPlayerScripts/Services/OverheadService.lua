@@ -16,7 +16,7 @@ local OverheadRemote = Remotes:WaitForChild("Overhead")
 
 local OverheadService = {}
 
-function OverheadService:Damage(fromPlayer, target, damage, args)
+function OverheadService:Damage(fromPlayer, position, damage, args)
 	if fromPlayer == LocalPlayer then
 		local newPart = DamagePart:Clone()
 		newPart.Gui.Frame.DamageText.Text = damage
@@ -29,7 +29,7 @@ function OverheadService:Damage(fromPlayer, target, damage, args)
 			newPart.Gui.Frame.DamageText.TextColor3 = Color3.fromRGB(255, 28, 28)
 		end
 
-		newPart:PivotTo(target:GetPivot() + Vector3.new(0, 5, 0))
+		newPart:PivotTo(CFrame.new(position) + Vector3.new(0, 5, 0))
 		newPart.Parent = workspace.Display
 
 		local goal = {StudsOffset = Vector3.new(0,5,0)}

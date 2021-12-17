@@ -113,7 +113,7 @@ function Ability:ServerAbility(player, castIdentifier, args, startTime)
 	
 	local playerCastInfo = AbInject.PlayerValues:GetValue(player, "CastInfo")
 	if playerCastInfo and playerCastInfo.castIdentifier == castIdentifier then
-		AbInject.DamageService:DoDamage(args.target.model, {
+		AbInject.DamageService:DoDamage(args.target.object, {
 			ability = SelfAbilityData.name,
 			damageType = "direct",
 			fromPlayer = player

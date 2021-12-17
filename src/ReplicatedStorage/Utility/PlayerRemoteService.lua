@@ -1,9 +1,8 @@
 local Players = game:GetService("Players")
 
 local ActionMapping = {
-	["use"] = 1,
-	["spawn-slime"] = 2,
-	["destroy-slime"] = 3,
+	["entity-create"] = 1,
+	["entity-update"] = 2,
 }
 
 local PlayerRemoteService = {}

@@ -14,6 +14,7 @@ local CollectionSelect = require(Utility:WaitForChild("CollectionSelect"))
 local PlayerScripts = LocalPlayer:WaitForChild("PlayerScripts")
 local PlayerServices = PlayerScripts:WaitForChild("Services")
 local MouseSelect = require(PlayerServices:WaitForChild("MouseSelect"))
+local EntityHandler = require(PlayerServices:WaitForChild("EntityHandler"))
 
 local PlayerUiModules = PlayerScripts:WaitForChild("Ui")
 local TargetUi = require(PlayerUiModules:WaitForChild("TargetUi"))
@@ -53,12 +54,24 @@ function TargetService:FindTarget()
 				
 				if targetType then
 					TargetService.CurrentTarget = {
-						model = model,
 						targetType = targetType
 					}
+
+					if targetType == "Player" then
+						TargetService.CurrentTarget.object = Players:GetPlayerFromCharacter(model)
+					elseif targetType == "NPC" then
+						TargetService.CurrentTarget.object = EntityHandler.GetEntityFromModel(model)
+					end
 					
-					PlayerValues:SetValue(LocalPlayer, "Target", TargetService.CurrentTarget)
-					TargetRemote:FireServer(TargetService.CurrentTarget)
+					if TargetService.CurrentTarget.object then
+						PlayerValues:SetValue(LocalPlayer, "Target", TargetService.CurrentTarget)
+						TargetRemote:FireServer({
+							targetType = TargetService.CurrentTarget.targetType,
+							object = {id = TargetService.CurrentTarget.object.id}
+						})
+					else
+						warn("Could not link model with entity")
+					end
 					
 					return TargetService.CurrentTarget
 				end

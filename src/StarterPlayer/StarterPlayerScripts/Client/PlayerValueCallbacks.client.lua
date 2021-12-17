@@ -24,8 +24,10 @@ PlayerValues:SetCallback("Class", classChanged)
 local function targetValueChanged(player, value)
 	local currentLocalTarget = TargetService:GetCurrentTarget()
 	if currentLocalTarget then
-		if currentLocalTarget.model == player.Character then
-			TargetUi:UpdateTargetProfile(currentLocalTarget)
+		if currentLocalTarget.targetType == "Player" then
+			if currentLocalTarget == player then
+				TargetUi:UpdateTargetProfile(currentLocalTarget)
+			end
 		end
 	end
 	
