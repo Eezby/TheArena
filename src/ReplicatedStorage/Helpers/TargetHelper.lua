@@ -69,11 +69,11 @@ function TargetHelper:CanUseAbility(player, abilityData, target)
 		return false, "No ability data"
 	end
 
-	if not TargetHelper:IsViableTarget(player, self:GetObjectFromTarget(target), abilityData.targetType) then
+	if not TargetHelper:IsViableTarget(player, target, abilityData.targetType) then
 		return false, "Invalid target"
 	end
 
-	if target ~= nil and not TargetHelper:IsTargetInRange(player.Character:GetPivot().Position, self:GetObjectFromTarget(target), abilityData.range) then
+	if target ~= nil and not TargetHelper:IsTargetInRange(player.Character:GetPivot().Position, target, abilityData.range) then
 		return false, "Target out of range"
 	end
 
@@ -89,7 +89,7 @@ end
 function TargetHelper:IsViableTarget(sender, target, targetType)
 	if target then
 		if targetType == "enemy" then
-			if target == sender then
+			if target.entity.Player == sender then
 				return false
 			end
 			
@@ -105,15 +105,7 @@ function TargetHelper:IsViableTarget(sender, target, targetType)
 end
 
 function TargetHelper:IsTargetInRange(position, target, range)
-	local targetPosition
-
-	if target.Character then
-		targetPosition = target.Character:GetPivot().Position
-	else
-		targetPosition = target.cframe.Position
-	end
-
-	return not target or range == nil or (position - targetPosition).Magnitude <= range
+	return not target or range == nil or (position - target.entity:GetCFrame().Position).Magnitude <= range
 end
 
 function TargetHelper:GetObjectFromTarget(target)
@@ -146,22 +138,10 @@ function TargetHelper:ConvertTargetForServer(target)
 	return convertedTarget
 end
 
-function TargetHelper:GetTargetPosition(target)
-	if typeof(target) == "Instance" then
-		if target.Parent == Players then
-			return target.Character:GetPivot().Position
-		end
-
-		return target:GetPivot().Position
-	elseif typeof(target) == "table" then
-		return target.cframe.Position
-	end
-end
-
 -- args: 
 -- [int] range
 function TargetHelper:GetNearbyTargets(sender, position, targetType, args)
-	local targets = CollectionSelect:SelectAll({"Player", "NPC"}) -- can probably be optimized with callback
+	local targets = CollectionSelect:SelectAll({"Entity"}) -- can probably be optimized with callback
 	local filteredTargets = {}
 	
 	for _,target in ipairs(targets) do

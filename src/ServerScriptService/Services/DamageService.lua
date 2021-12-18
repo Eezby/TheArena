@@ -111,7 +111,7 @@ function DamageService:DoDamage(targets, args)
 			EffectService:TookDamage(target, args.damageType, args.fromPlayer)
 			
 			if args.fromPlayer then
-				OverheadRemote:FireAllClients("damage", args.fromPlayer, TargetHelper:GetTargetPosition(target), adjustedDamage, {
+				OverheadRemote:FireAllClients("damage", args.fromPlayer, target:GetCFrame().Position, adjustedDamage, {
 					isCrit = isCriticalHit
 				})
 			end

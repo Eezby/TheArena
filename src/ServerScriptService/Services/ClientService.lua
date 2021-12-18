@@ -12,6 +12,7 @@ local AbilityFunctions = require(Utility.AbilityFunctions)
 
 local SerServices = ServerScriptService.Services
 local EffectService = require(SerServices.EffectService)
+local EntityService = require(SerServices.EntityService)
 
 local Helpers = ReplicatedStorage.Helpers
 local TargetHelper = require(Helpers.TargetHelper)
@@ -67,7 +68,11 @@ end
 function ClientService:UseAbility(player, ability, identifier, args, startTime)
 	local timeDifference = math.abs(SharedFunctions:GetTime() - startTime)
 	
-	args.target.object = TargetHelper:GetObjectFromTarget(args.target)
+	if args.target then
+		args.target = {
+			entity = EntityService.GetEntityFromId(args.target.entityId)
+		}
+	end
 	
 	local abilityData = AbilityData[ability]
 	local abilityIsAvailable, errorMessage = TargetHelper:CanUseAbility(player, abilityData, args.target)
@@ -95,8 +100,10 @@ ClientInputRemote.OnServerEvent:Connect(function(client, action, startTime, args
 end)
 
 TargetRemote.OnServerEvent:Connect(function(client, target)
-	target.object = TargetHelper:GetObjectFromTarget(target)
-	PlayerValues:SetValue(client, "Target", target, true)
+	local targetEntity = EntityService.GetEntityFromId(target.entityId)
+	local playerEntity = EntityService.GetPlayerEntity(client)
+
+	playerEntity:SetTarget(targetEntity)
 end)
 
 return ClientService

@@ -44,17 +44,26 @@ local AbilityService = {}
 function AbilityService:NormalAbility(castIdentifier, ability, args)
 	local abilityData = AbilityData[ability]
 
-	args.target = TargetHelper:ConvertTargetForServer(args.target)
-	
 	local abilityIsAvailable, errorMessage = TargetHelper:CanUseAbility(LocalPlayer, abilityData, args.target)
 	if abilityIsAvailable then
+		local argsToSend = {}
+		for property,value in pairs(args) do
+			argsToSend[property] = value
+		end
+
+		if argsToSend.target then
+			argsToSend.target = {
+				entityId = argsToSend.target.entity.Id
+			}
+		end
+
 		ClientInputRemote:FireServer("ability-start", SharedFunctions:GetTime(), {
-			ability = ability, 
-			id = castIdentifier, 
-			args = args
+			ability = ability,
+			id = castIdentifier,
+			args = argsToSend
 		})
 		
-		AbilityFunctionsSignal:Fire("RunAbilityFunction", ability, "ClientAbility", LocalPlayer, castIdentifier, args, SharedFunctions:GetTime())
+		AbilityFunctionsSignal:Fire("RunAbilityFunction", ability, "ClientAbility", LocalPlayer, castIdentifier, argsToSend, SharedFunctions:GetTime())
 
 		if (abilityData.castTime and abilityData.castTime > 0) then
 			CastbarUi:Cast(ability, abilityData.castTime)

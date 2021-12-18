@@ -25,49 +25,33 @@ local CastbarUi = require(PlayerUiModules:WaitForChild("CastbarUi"))
 local PlayerServices = PlayerScripts:WaitForChild("Services")
 local EntityHandler = require(PlayerServices:WaitForChild("EntityHandler"))
 
+local PlayerEntity = EntityHandler.GetPlayerEntity(LocalPlayer, true)
+
 local function getTargetInfo(target)
 	local info = {}
-	info.targetType = target.targetType
-	
-	if target.targetType == "Player" then
-		info.player = target.object
-		
-		info.name = info.player.Name
-		info.model = info.player.Character
-		info.health = PlayerValues:GetValue(info.player, "Health") or 1
-		info.maxHealth = PlayerValues:GetValue(info.player, "MaxHealth") or 1
-		info.power = PlayerValues:GetValue(info.player, "Power") or 1
-		info.maxPower = PlayerValues:GetValue(info.player, "MaxPower") or 1
-		info.castInfo = PlayerValues:GetValue(info.player, "CastInfo")
-		info.target = PlayerValues:GetValue(info.player, "Target")
-		info.class = PlayerValues:GetValue(info.player, "Class") or "???"
-	elseif target.targetType == "NPC" then
-		info.entity = EntityHandler.GetEntityFromId(target.object.id)
+	info.entity = target.entity
+	info.name = target.entity.Name
+	info.model = target.entity:GetModel()
+	info.health = target.entity.Health or 1
+	info.maxHealth = target.entity.MaxHealth or 1
+	info.power = target.entity.Power or 1
+	info.maxPower = target.entity.MaxPower or 1
+	info.castInfo = target.entity.CastInfo
+	info.target = info.entity.Target
+	info.class = info.entity.Class or "???"
 
-		info.name = info.entity.name
-		info.model = info.entity.visual
-		info.health = info.entity.health
-		info.maxHealth = info.entity.maxHealth
-		info.power = 25
-		info.maxPower = 25
-		info.castInfo = nil
-		info.target = nil
-		info.class = "NPC"
-	end
-	
 	return info
 end
 
 local function getSelfInfo()
 	local info = {}
-	info.model = LocalPlayer.Character
-	info.name = LocalPlayer.Name
-	info.player = LocalPlayer
-	info.health = PlayerValues:GetValue(LocalPlayer, "Health") or 1
-	info.maxHealth = PlayerValues:GetValue(LocalPlayer, "MaxHealth") or 1
-	info.power = PlayerValues:GetValue(LocalPlayer, "Power") or 1
-	info.maxPower = PlayerValues:GetValue(LocalPlayer, "MaxPower") or 1
-	info.class = PlayerValues:GetValue(LocalPlayer, "Class") or "???"
+	info.model = PlayerEntity:GetModel()
+	info.name = PlayerEntity.Name
+	info.health = PlayerEntity.Health or 1
+	info.maxHealth = PlayerEntity.MaxHealth or 1
+	info.power = PlayerEntity.Power or 1
+	info.maxPower = PlayerEntity.MaxPower or 1
+	info.class = PlayerEntity.Class or "???"
 	
 	return info
 end

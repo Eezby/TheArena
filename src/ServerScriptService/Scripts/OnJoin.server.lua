@@ -12,6 +12,7 @@ local ErrorCodeHelper = require(Helpers.ErrorCodeHelper)
 local SerServices = ServerScriptService.Services
 local DataHandler = require(SerServices.DataHandler)
 local ClientService = require(SerServices.ClientService)
+local EntityService = require(SerServices.EntityService)
 
 local PlayerProfiles = {}
 
@@ -21,15 +22,19 @@ end
 
 local function characterAdded(newCharacter)
 	newCharacter.ChildAdded:Connect(function()
-		CollectionService:AddTag(newCharacter, "Player")
+		CollectionService:AddTag(newCharacter, "Entity")
 	end)
 	
-	CollectionService:AddTag(newCharacter, "Player")
+	CollectionService:AddTag(newCharacter, "Entity")
+	EntityService.new({
+		Name = newCharacter.Name,
+		BoundObject = newCharacter,
+		Player = Players:GetPlayerFromCharacter(newCharacter)
+	})
 end
 
 local function playerAdded(newPlayer)
 	task.spawn(function()
-		print(newPlayer.Character or newPlayer.CharacterAdded:Wait())
 		characterAdded(newPlayer.Character or newPlayer.CharacterAdded:Wait())
 	end)
 	

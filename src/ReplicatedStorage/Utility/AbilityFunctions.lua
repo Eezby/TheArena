@@ -1,5 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local ServerScriptService = game:GetService("ServerScriptService")
+local Players = game:GetService("Players")
 
 local IsServer = RunService:IsServer()
 
@@ -10,6 +12,21 @@ if IsServer then
 	Signal.Parent = script
 else
 	Signal = script:WaitForChild("Signal")
+end
+
+
+local EntityService
+local EntityHandler
+
+if IsServer then
+	local SerServices = ServerScriptService.Services
+	EntityService = require(SerServices.EntityService)
+else
+	local LocalPlayer = Players.LocalPlayer
+	local PlayerScripts = LocalPlayer:WaitForChild("PlayerScripts")
+	local PlayerServices = PlayerScripts:WaitForChild("Services")
+
+	EntityHandler = require(PlayerServices:WaitForChild("EntityHandler"))
 end
 
 local RepServices = ReplicatedStorage:WaitForChild("Services")
@@ -30,9 +47,21 @@ end
 local AbilityFunctions = {}
 
 function AbilityFunctions:RunAbilityFunction(ability, func, ...)
+	local args = {...}
+
+	for _,arg in pairs(args) do
+		if typeof(arg) == "table" and arg.target then
+			if not IsServer then
+				arg.target = {
+					entity = EntityHandler.GetEntityFromId(arg.target.entityId)
+				}
+			end
+		end
+	end
+
 	local abilityScript = Abilities[ability]
 	if abilityScript and abilityScript[func] then
-		abilityScript[func](self, ...)
+		abilityScript[func](self, table.unpack(args))
 	end
 end
 

@@ -9,7 +9,6 @@ local EntityHandler
 
 if IsServer then
 	local SerServices = ServerScriptService.Services
-
 	EntityService = require(SerServices.EntityService)
 else
 	local LocalPlayer = Players.LocalPlayer
@@ -20,11 +19,9 @@ else
 end
 
 local function getTargetPosition(target)
-	if typeof(target) == "Instance" then 		-- Player, Client Entity
-		return target:GetPivot().Position
-	elseif typeof(target) == "table" then		-- Server Entity
-		return target.cframe.Position
-	elseif typeof(target) == "CFrame" then		-- CFrame
+	if typeof(target) == "table" then
+		return target:GetCFrame().Position
+	elseif typeof(target) == "CFrame" then
 		return target.Position
 	end
 	
@@ -42,10 +39,6 @@ function ProjectileService:FireAtTarget(target, args)
 		cframe = args.startCFrame or CFrame.new()
 	}
 
-	if target.Parent == Players then
-		interactable.target = target.Character
-	end
-	
 	interactable.connection = RunService.Heartbeat:Connect(function(dt)
 		local targetDirection = (getTargetPosition(interactable.target) - interactable.cframe.Position).Unit
 		interactable.cframe += targetDirection * args.projectileSpeed * dt

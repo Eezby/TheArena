@@ -29,10 +29,13 @@ local PlayerScripts = LocalPlayer:WaitForChild("PlayerScripts")
 local PlayerServices = PlayerScripts:WaitForChild("Services")
 local EffectReplicator = require(PlayerServices:WaitForChild("EffectReplicator"))
 local AbilityService = require(PlayerServices:WaitForChild("AbilityService"))
+local EntityHandler = require(PlayerServices:WaitForChild("EntityHandler"))
 
 local PlayerUiModules = PlayerScripts:WaitForChild("Ui")
 local HotbarUi = require(PlayerUiModules:WaitForChild("HotbarUi"))
 local CastbarUi = require(PlayerUiModules:WaitForChild("CastbarUi"))
+
+local PlayerEntity = EntityHandler.GetPlayerEntity(LocalPlayer, true)
 
 local CastIdentifier = 0
 
@@ -48,7 +51,7 @@ end
 
 local function useAbility(ability, keyCharacter)
 	local abilityData = AbilityData[ability]
-	local currentTarget = PlayerValues:GetValue(LocalPlayer, "Target")
+	local currentTarget = PlayerEntity.Target
 	
 	CastIdentifier += 1
 	

@@ -22,6 +22,8 @@ local TargetUi = require(PlayerUiModules:WaitForChild("TargetUi"))
 local Remotes = ReplicatedStorage:WaitForChild("Remotes")
 local TargetRemote = Remotes:WaitForChild("Target")
 
+local PlayerEntity = EntityHandler.GetPlayerEntity(LocalPlayer, true)
+
 local TargetService = {}
 TargetService.CurrentTarget = nil
 
@@ -37,44 +39,28 @@ function TargetService:Init()
 end
 
 function TargetService:FindTarget()
-	local whitelist = CollectionSelect:SelectAll({"Player", "NPC"})
+	local whitelist = CollectionSelect:SelectAll({"Entity"})
 	local result = MouseSelect:Whitelist(whitelist)
 	
 	if result then
 		if result.Instance then
 			local model = result.Instance:FindFirstAncestorOfClass("Model")
 			if model then
-				local targetType = nil
-				
-				if CollectionService:HasTag(model, "Player") then
-					targetType = "Player"
-				elseif CollectionService:HasTag(model, "NPC") then
-					targetType = "NPC"
-				end
-				
-				if targetType then
+				local entity = EntityHandler.GetEntityFromModel(model)
+				if entity then
 					TargetService.CurrentTarget = {
-						targetType = targetType
+						entity = entity
 					}
 
-					if targetType == "Player" then
-						TargetService.CurrentTarget.object = Players:GetPlayerFromCharacter(model)
-					elseif targetType == "NPC" then
-						TargetService.CurrentTarget.object = EntityHandler.GetEntityFromModel(model)
-					end
-					
-					if TargetService.CurrentTarget.object then
-						PlayerValues:SetValue(LocalPlayer, "Target", TargetService.CurrentTarget)
-						TargetRemote:FireServer({
-							targetType = TargetService.CurrentTarget.targetType,
-							object = {id = TargetService.CurrentTarget.object.id}
-						})
-					else
-						warn("Could not link model with entity")
-					end
-					
-					return TargetService.CurrentTarget
+					PlayerEntity:SetTarget(TargetService.CurrentTarget)
+					TargetRemote:FireServer({
+						entityId = TargetService.CurrentTarget.entity.Id
+					})
+				else
+					warn("Could not link model with entity")
 				end
+
+				return TargetService.CurrentTarget
 			end
 		end
 	end
